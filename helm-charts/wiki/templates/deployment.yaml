@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: {{ .Values.image.repo }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.image.imagePullPolicy }}
+        # securityContext:
+        #   capabilities:
+        #     add: ["NET_ADMIN", "SYS_TIME"]
+        env:
+        - name: DB_TYPE
+          value: {{ .Values.db.type }}
+        - name: DB_HOST
+          value: {{ .Values.db.host }}
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.db.secretName }}
+              key: {{ .Values.db.name }}
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.db.secretName }}
+              key: {{ .Values.db.user }}
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.db.secretName }}
+              key: {{ .Values.db.pass }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        ports:
+          - name: {{ .Values.name }}
+            containerPort: {{ .Values.service.targetPort }}

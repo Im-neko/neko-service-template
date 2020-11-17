@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: {{ .Values.image.repo }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.image.imagePullPolicy }}
+        env:
+        - name: MYSQL_HOST
+          value: {{ .Values.db.host }}
+        - name: MYSQL_DATABASE 
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: {{ .Values.db.name }}
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: {{ .Values.db.user }}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: {{ .Values.db.pass }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        ports:
+          - name: {{ .Values.name }}
+            containerPort: {{ .Values.service.port }}
+        volumeMounts:
+        - name: {{ .Values.name }}
+          mountPath: {{ .Values.mountPath }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      volumes:
+      - name: {{ .Values.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.name }}

@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repo: mariadb:10.5.6
+  pullPolicy: Always
+
+
+imagePullSecret: ""
+nameOverride: ""
+fullnameOverride: ""
+
+name: mariadb
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  port: 3306
+  targetPort: 3306
+  clusterIP: None
+
+resources: 
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+secretName: mariadb-pass
+
+db:
+  root_pass: mysql_root_pass
+  user: mysql_user
+  pass: mysql_pass
+
+nfs:
+  host: 192.168.2.1
+  path: /srv/nfs/mariadb
+  storage: 10Gi 
+
+mountPath: /var/lib/mysql
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

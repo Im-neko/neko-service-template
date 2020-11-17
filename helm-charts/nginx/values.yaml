@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  repo: nginx:latest
+  pullPolicy: Always
+
+
+imagePullSecret: ""
+nameOverride: ""
+fullnameOverride: ""
+
+name: nginx
+hostname: 
+  - "example.com"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+resources: 
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+nfs:
+  host: 192.168.2.1
+  path: /srv/nfs/nginx
+  storage: 500Mi
+
+mountPath: /usr/share/nginx
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

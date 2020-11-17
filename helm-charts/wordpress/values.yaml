@@ -1,0 +1,59 @@
+replicaCount: 1
+
+image:
+  repo: wordpress:apache
+  pullPolicy: Always
+
+
+imagePullSecret: 
+nameOverride: ""
+fullnameOverride: ""
+
+name: wordpress
+hostname: 
+  - "example.com"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+resources: 
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+secretName: wordpress-secret
+
+db:
+  host: mariadb.infra.svc.cluster.local
+  name: db_name
+  user: db_user
+  pass: db_pass
+
+nfs:
+  host: 192.168.2.1
+  path: /srv/nfs/wordpress
+  storage: 3Gi 
+
+mountPath: /var/www/html
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
